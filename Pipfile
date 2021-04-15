@@ -12,6 +12,7 @@ torch = "*"
 torchvision = "*"
 neptune-client = "*"
 jupyterlab = "*"
+scikit-image = "*"
 
 [dev-packages]
 
