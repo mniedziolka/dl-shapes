@@ -17,6 +17,9 @@ from datasets.shapes_dataset import ShapesClassificationDataset
 from datasets.transformers import RandomVerticalFlip, RandomHorizontalFlip, RandomRightRotation
 
 from models.fc import FCNet
+from models.cnn import ConvNet
+
+from training import train_and_evaluate_model, setup_neptune
 
 # dataset = ShapesClassificationDataset(
 #     "data/labels.csv",
@@ -36,9 +39,13 @@ from models.fc import FCNet
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+# setup_neptune()
+
 transform_images = transforms.Compose([
+    transforms.Grayscale(num_output_channels=1),
     transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5, 0.5), (0.5, 0.5, 0.5, 0.5))
+    # transforms.Normalize((0.5, 0.5, 0.5, 0.5), (0.5, 0.5, 0.5, 0.5)),
+    transforms.Normalize(0.5, 0.5)
 ])
 
 train_set = ShapesClassificationDataset(
@@ -66,51 +73,16 @@ validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=batch
 classes = ('squares', 'circles', 'triangle_up', 'triangle_right',
            'triangle_down', 'triangle_left')
 
-net = FCNet().to(device)
+model = ConvNet().to(device)
 
 criterion = nn.BCEWithLogitsLoss(reduction='sum')
-optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
-for epoch in range(1):  # loop over the dataset multiple times
-    print("EPOKA")
-    running_loss = 0.0
-    for inputs, labels in train_loader:
-        inputs = inputs.to(device)
-        labels = labels.to(device)
+hist = train_and_evaluate_model(model, criterion, optimizer,
+                                train_loader, train_set,
+                                validation_loader, validation_set,
+                                device)
 
-        # zero the parameter gradients
-        optimizer.zero_grad()
-
-        outputs = net(inputs)
-
-        loss = criterion(outputs.float(), labels.float())
-        # loss = criterion(output, target)
-
-        loss.backward()
-        optimizer.step()
-
-        # print statistics
-        running_loss += loss.item()
-
-running_loss_test = 0.0
-running_corrects_test = 0
-
-for inputs, labels in validation_loader:
-    inputs = inputs.to(device)
-    labels = labels.to(device)
-
-    outputs = net(inputs)
-
-    loss = criterion(outputs.float(), labels.float())
-
-    _, preds = torch.topk(outputs, 2, 1)
-    print(preds)
-
-    running_loss_test += loss.detach() * inputs.size(0)
-    running_corrects_test += torch.sum(preds == labels.data)
-
-acc_test = running_corrects_test.float() / len(validation_set)
-print(acc_test)
 print('Finished Training')
 
 

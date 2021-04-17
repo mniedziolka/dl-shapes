@@ -13,6 +13,7 @@ torchvision = "*"
 neptune-client = "*"
 jupyterlab = "*"
 scikit-image = "*"
+psutil = "*"
 
 [dev-packages]
 
