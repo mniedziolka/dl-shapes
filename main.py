@@ -39,7 +39,7 @@ from training import train_and_evaluate_model, setup_neptune
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-# setup_neptune()
+setup_neptune()
 
 transform_images = transforms.Compose([
     transforms.Grayscale(num_output_channels=1),
@@ -62,7 +62,7 @@ validation_set = ShapesClassificationDataset(
     transform_images=transform_images
 )
 
-batch_size = 100
+batch_size = 500
 
 train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
                                            shuffle=True, num_workers=2)
@@ -76,12 +76,13 @@ classes = ('squares', 'circles', 'triangle_up', 'triangle_right',
 model = ConvNet().to(device)
 
 criterion = nn.BCEWithLogitsLoss(reduction='sum')
-optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+# optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+optimizer = optim.Adam(model.parameters())
 
 hist = train_and_evaluate_model(model, criterion, optimizer,
                                 train_loader, train_set,
                                 validation_loader, validation_set,
-                                device)
+                                device, num_epochs=31)
 
 print('Finished Training')
 
