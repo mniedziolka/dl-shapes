@@ -14,7 +14,7 @@ class RandomHorizontalFlip:
 
         if torch.rand(1) < self.p:
             image = transforms.RandomHorizontalFlip(1)(image)
-            target[[2, 4]] = target[[4, 2]]
+            target[[3, 5]] = target[[5, 3]]
 
         return image, target
 
@@ -29,7 +29,7 @@ class RandomVerticalFlip:
 
         if torch.rand(1) < self.p:
             image = transforms.RandomVerticalFlip(1)(image)
-            target[[3, 5]] = target[[5, 3]]
+            target[[2, 4]] = target[[4, 2]]
 
         return image, target
 
