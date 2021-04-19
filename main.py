@@ -82,7 +82,7 @@ optimizer = optim.Adam(model.parameters())
 hist = train_and_evaluate_model(model, criterion, optimizer,
                                 train_loader, train_set,
                                 validation_loader, validation_set,
-                                device, num_epochs=31)
+                                device, num_epochs=50)
 
 print('Finished Training')
 
