@@ -32,16 +32,11 @@ def log_values(key, value):
 
 
 def calculate_accuracy(chosen_classes, labels):
-    acc = 0.0
-
-    for i in range(labels.shape[0]):
-        labels_row = labels[i]
-        chosen_row = chosen_classes[i]
-
-        # acc += np.all(labels_row[chosen_row])
-        acc += torch.all(labels_row[chosen_row])
-
-    return acc
+    return torch.sum(
+        torch.all(
+            chosen_classes == torch.nonzero(labels, as_tuple=True)[1].view(-1, 2),
+            dim=1)
+    )
 
 
 def train_and_evaluate_model(
@@ -54,11 +49,12 @@ def train_and_evaluate_model(
         val_set,
         device,
         num_epochs=10,
+        save_every_nth_all=1,
         save_every_nth_batch_loss=50
 ):
     try:
         for epoch in range(num_epochs):
-
+            epoch_start = time.time()
             print('Epoch {}/{}'.format(epoch + 1, num_epochs))
             print('-' * 10)
 
@@ -69,7 +65,7 @@ def train_and_evaluate_model(
             running_corrects_train = 0.0
 
             i = 0
-            start = time.time()
+
             for inputs, labels in train_loader:
                 inputs = inputs.to(device)
                 labels = labels.to(device)
@@ -84,30 +80,22 @@ def train_and_evaluate_model(
                 running_loss_train += loss.detach() * inputs.size(0)
 
                 _, chosen_classes = torch.topk(outputs, 2, 1)
-                # if epoch % 1 == 0:
-                #
-                #     running_corrects_train += calculate_accuracy(chosen_classes, labels)
-                #     # running_corrects_train += calculate_accuracy(chosen_classes.detach().cpu().numpy(),
-                #     #                                              labels.detach().cpu().numpy())
+                if epoch % save_every_nth_all == 0:
+                    running_corrects_train += calculate_accuracy(chosen_classes, labels)
 
                 if i % save_every_nth_batch_loss == 0:
                     log_values('train/batch_loss', loss.item())
+
                 i += 1
-            end = time.time()
-            print("Elapsed time = %s" % (end - start))
 
             epoch_loss_train = running_loss_train / len(train_set)
-            if epoch % 1 == 0:
+            log_values('train/loss', epoch_loss_train)
+            print(f'[TRAIN] loss: {epoch_loss_train}')
+
+            if epoch % save_every_nth_all == 0:
                 epoch_acc_train = running_corrects_train / len(train_set)
-
-            if epoch % 1 == 0:
-                print('train loss: {:.4f}, train acc: {:.4f}'. \
-                      format(epoch_loss_train.item(),
-                             epoch_acc_train))
-
-            log_values('train/loss', epoch_loss_train.item())
-            # if epoch % 1 == 0:
-            #     log_values('train/acc', epoch_acc_train)
+                log_values('train/acc', epoch_acc_train)
+                print(f'[TRAIN] accuracy: {epoch_acc_train}')
 
             # evaluating phase
             model.eval()
@@ -125,24 +113,20 @@ def train_and_evaluate_model(
                 running_loss_val += loss.detach() * inputs.size(0)
 
                 _, chosen_classes = torch.topk(outputs, 2, 1)
-                # if epoch % 1 == 0:
-                #     running_corrects_val += calculate_accuracy(chosen_classes, labels)
-                #
-                #     # running_corrects_val += calculate_accuracy(chosen_classes.detach().cpu().numpy(),
-                #     #                                            labels.detach().cpu().numpy())
+                if epoch % save_every_nth_all == 0:
+                    running_corrects_val += calculate_accuracy(chosen_classes, labels)
 
             epoch_loss_test = running_loss_val / len(val_set)
-            if epoch % 1 == 0:
+            log_values('validation/loss', epoch_loss_test)
+            print(f'[TEST] loss: {epoch_loss_test}')
+
+            if epoch % save_every_nth_all == 0:
                 epoch_acc_test = running_corrects_val / len(val_set)
+                log_values('validation/acc', epoch_acc_test)
+                print(f'[TEST] accuracy: {epoch_acc_test}')
 
-            if epoch % 1 == 0:
-                print('validation loss: {:.4f}, test acc: {:.4f}\n'. \
-                      format(epoch_loss_test.item(),
-                             epoch_acc_test))
-
-            log_values('validation/loss', epoch_loss_test.item())
-            # if epoch % 1 == 0:
-            #     log_values('validation/acc', epoch_acc_test)
+            epoch_end = time.time()
+            print("Epoch elapsed time = %s" % (epoch_end - epoch_start))
 
     except KeyboardInterrupt:
         print('Interrupt')
