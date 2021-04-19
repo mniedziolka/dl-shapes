@@ -48,10 +48,16 @@ transform_images = transforms.Compose([
     transforms.Normalize(0.5, 0.5)
 ])
 
+transform_all = transforms.Compose([
+        RandomHorizontalFlip(0.5),
+        RandomVerticalFlip(0.5),
+        RandomRightRotation(0.5),
+])
+
 train_set = ShapesClassificationDataset(
     "data/train.csv",
     "data/images",
-    transform_all=None,
+    transform_all=transform_all,
     transform_images=transform_images
 )
 
@@ -62,7 +68,7 @@ validation_set = ShapesClassificationDataset(
     transform_images=transform_images
 )
 
-batch_size = 500
+batch_size = 1000
 
 train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
                                            shuffle=True, num_workers=2)
@@ -82,7 +88,7 @@ optimizer = optim.Adam(model.parameters())
 hist = train_and_evaluate_model(model, criterion, optimizer,
                                 train_loader, train_set,
                                 validation_loader, validation_set,
-                                device, num_epochs=50)
+                                device, num_epochs=100)
 
 print('Finished Training')
 
