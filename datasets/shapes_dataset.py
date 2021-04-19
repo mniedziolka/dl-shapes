@@ -60,3 +60,29 @@ class ShapesClassificationDataset(ShapesDataset):
             image = self.transform_images(image)
 
         return image, shapes
+
+
+class ShapesCounterDataset(ShapesDataset):
+
+    def __getitem__(self, idx):
+        if torch.is_tensor(idx):
+            idx = idx.tolist()
+
+        shapes = self.shapes_frame.iloc[idx, 1:]
+        shapes = np.array([shapes])
+        shapes = shapes.astype('float').flatten()
+
+        img_name = os.path.join(self.root_dir,
+                                self.shapes_frame.iloc[idx, 0])
+
+        image = io.imread(img_name)
+
+        image = transforms.ToPILImage()(image)
+
+        if self.transform_all:
+            image, shapes = self.transform_all((image, shapes))
+
+        if self.transform_images:
+            image = self.transform_images(image)
+
+        return image, shapes

@@ -84,11 +84,11 @@ def train_and_evaluate_model(
                 running_loss_train += loss.detach() * inputs.size(0)
 
                 _, chosen_classes = torch.topk(outputs, 2, 1)
-                if epoch % 1 == 0:
-
-                    running_corrects_train += calculate_accuracy(chosen_classes, labels)
-                    # running_corrects_train += calculate_accuracy(chosen_classes.detach().cpu().numpy(),
-                    #                                              labels.detach().cpu().numpy())
+                # if epoch % 1 == 0:
+                #
+                #     running_corrects_train += calculate_accuracy(chosen_classes, labels)
+                #     # running_corrects_train += calculate_accuracy(chosen_classes.detach().cpu().numpy(),
+                #     #                                              labels.detach().cpu().numpy())
 
                 if i % save_every_nth_batch_loss == 0:
                     log_values('train/batch_loss', loss.item())
@@ -106,8 +106,8 @@ def train_and_evaluate_model(
                              epoch_acc_train))
 
             log_values('train/loss', epoch_loss_train.item())
-            if epoch % 1 == 0:
-                log_values('train/acc', epoch_acc_train)
+            # if epoch % 1 == 0:
+            #     log_values('train/acc', epoch_acc_train)
 
             # evaluating phase
             model.eval()
@@ -125,11 +125,11 @@ def train_and_evaluate_model(
                 running_loss_val += loss.detach() * inputs.size(0)
 
                 _, chosen_classes = torch.topk(outputs, 2, 1)
-                if epoch % 1 == 0:
-                    running_corrects_val += calculate_accuracy(chosen_classes, labels)
-
-                    # running_corrects_val += calculate_accuracy(chosen_classes.detach().cpu().numpy(),
-                    #                                            labels.detach().cpu().numpy())
+                # if epoch % 1 == 0:
+                #     running_corrects_val += calculate_accuracy(chosen_classes, labels)
+                #
+                #     # running_corrects_val += calculate_accuracy(chosen_classes.detach().cpu().numpy(),
+                #     #                                            labels.detach().cpu().numpy())
 
             epoch_loss_test = running_loss_val / len(val_set)
             if epoch % 1 == 0:
@@ -141,8 +141,8 @@ def train_and_evaluate_model(
                              epoch_acc_test))
 
             log_values('validation/loss', epoch_loss_test.item())
-            if epoch % 1 == 0:
-                log_values('validation/acc', epoch_acc_test)
+            # if epoch % 1 == 0:
+            #     log_values('validation/acc', epoch_acc_test)
 
     except KeyboardInterrupt:
         print('Interrupt')

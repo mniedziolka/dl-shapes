@@ -14,33 +14,18 @@ import torchvision.transforms as transforms
 import neptune
 from torch.autograd import Variable
 
-from datasets.shapes_dataset import ShapesClassificationDataset
+from datasets.shapes_dataset import ShapesClassificationDataset, ShapesCounterDataset
 from datasets.transformers import RandomVerticalFlip, RandomHorizontalFlip, RandomRightRotation
 
 from models.shapes_classifier import ShapesClassifier
+from models.shapes_counter import ShapesCounter
 
 from training import train_and_evaluate_model, setup_neptune
 
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-def main(args):
-    if args.neptune:
-        setup_neptune()
 
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-    transform_images = transforms.Compose([
-        transforms.Grayscale(num_output_channels=1),
-        transforms.ToTensor(),
-        # transforms.Normalize((0.5, 0.5, 0.5, 0.5), (0.5, 0.5, 0.5, 0.5)),
-        transforms.Normalize(0.5, 0.5)
-    ])
-
-    transform_all = transforms.Compose([
-        RandomHorizontalFlip(0.5),
-        RandomVerticalFlip(0.5),
-        RandomRightRotation(0.5),
-    ])
-
+def train_classifier(transform_images, transform_all):
     train_set = ShapesClassificationDataset(
         "data/train.csv",
         "data/images",
@@ -77,6 +62,87 @@ def main(args):
                                     validation_loader, validation_set,
                                     device, num_epochs=100)
 
+    return hist
+
+
+def train_counter(transform_images, transform_all):
+    train_set = ShapesCounterDataset(
+        "data/train.csv",
+        "data/images",
+        transform_all=None,
+        transform_images=transform_images
+    )
+
+    validation_set = ShapesCounterDataset(
+        "data/val.csv",
+        "data/images",
+        transform_all=None,
+        transform_images=transform_images
+    )
+
+    batch_size = 100
+
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
+                                               shuffle=True, num_workers=2)
+
+    validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=batch_size,
+                                                    shuffle=False, num_workers=2)
+
+    model = ShapesCounter().to(device)
+
+    def counter_loss(outputs, labels):
+        loss = torch.zeros(outputs.shape[0], device=device)
+        for batch in range(outputs.shape[0]):
+            output = outputs[batch]
+            label = labels[batch]
+
+            for i in range(6):
+                class_output = F.softmax(output[i*10:(i+1)*10])
+                class_label = label[i]
+
+                for j in range(10):
+                    loss[batch] += class_output[j] * (j - class_label)**2
+
+        return torch.sum(loss)
+
+    criterion = counter_loss
+    # optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    optimizer = optim.Adam(model.parameters())
+
+    hist = train_and_evaluate_model(model, criterion, optimizer,
+                                    train_loader, train_set,
+                                    validation_loader, validation_set,
+                                    device, num_epochs=100)
+
+    return hist
+
+
+def main(args):
+    if args.neptune:
+        setup_neptune()
+
+    transform_images = transforms.Compose([
+        transforms.Grayscale(num_output_channels=1),
+        transforms.ToTensor(),
+        # transforms.Normalize((0.5, 0.5, 0.5, 0.5), (0.5, 0.5, 0.5, 0.5)),
+        transforms.Normalize(0.5, 0.5)
+    ])
+
+    transform_all = transforms.Compose([
+        RandomHorizontalFlip(0.5),
+        RandomVerticalFlip(0.5),
+        RandomRightRotation(0.5),
+    ])
+
+    if args.model == 'classifier':
+        hist = train_classifier(transform_images, transform_all)
+
+    elif args.model == 'counter':
+        hist = train_counter(transform_images, transform_all)
+
+    else:
+        raise ValueError('Unknown model')
+
     print('Finished Training')
 
 
@@ -89,7 +155,3 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     main(args)
-
-
-
-
