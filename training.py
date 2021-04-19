@@ -31,7 +31,6 @@ def log_values(key, value):
     hist_run[key].append(value)
 
 
-@jit(nopython=True, parallel=True, fastmath=True)
 def calculate_accuracy(chosen_classes, labels):
     acc = 0.0
 
@@ -39,8 +38,8 @@ def calculate_accuracy(chosen_classes, labels):
         labels_row = labels[i]
         chosen_row = chosen_classes[i]
 
-        acc += np.all(labels_row[chosen_row])
-        # acc += torch.all(labels_row[chosen_row])
+        # acc += np.all(labels_row[chosen_row])
+        acc += torch.all(labels_row[chosen_row])
 
     return acc
 
@@ -87,9 +86,9 @@ def train_and_evaluate_model(
                 _, chosen_classes = torch.topk(outputs, 2, 1)
                 if epoch % 1 == 0:
 
-                    # running_corrects_train += calculate_accuracy(chosen_classes, labels)
-                    running_corrects_train += calculate_accuracy(chosen_classes.detach().cpu().numpy(),
-                                                                 labels.detach().cpu().numpy())
+                    running_corrects_train += calculate_accuracy(chosen_classes, labels)
+                    # running_corrects_train += calculate_accuracy(chosen_classes.detach().cpu().numpy(),
+                    #                                              labels.detach().cpu().numpy())
 
                 if i % save_every_nth_batch_loss == 0:
                     log_values('train/batch_loss', loss.item())
@@ -127,10 +126,10 @@ def train_and_evaluate_model(
 
                 _, chosen_classes = torch.topk(outputs, 2, 1)
                 if epoch % 1 == 0:
-                    # running_corrects_val += calculate_accuracy(chosen_classes, labels)
+                    running_corrects_val += calculate_accuracy(chosen_classes, labels)
 
-                    running_corrects_val += calculate_accuracy(chosen_classes.detach().cpu().numpy(),
-                                                               labels.detach().cpu().numpy())
+                    # running_corrects_val += calculate_accuracy(chosen_classes.detach().cpu().numpy(),
+                    #                                            labels.detach().cpu().numpy())
 
             epoch_loss_test = running_loss_val / len(val_set)
             if epoch % 1 == 0:
