@@ -31,12 +31,19 @@ def log_values(key, value):
     hist_run[key].append(value)
 
 
-def calculate_accuracy(chosen_classes, labels):
-    return torch.sum(
+def calculate_accuracy(outputs, labels):
+    _, chosen_classes = torch.topk(outputs, 2, 1, sorted=False)
+
+    chosen_classes, _ = torch.sort(chosen_classes, dim=1)
+
+    accuracy = torch.sum(
         torch.all(
             chosen_classes == torch.nonzero(labels, as_tuple=True)[1].view(-1, 2),
-            dim=1)
+            dim=1
+        )
     )
+
+    return accuracy
 
 
 def train_and_evaluate_model(
@@ -77,11 +84,10 @@ def train_and_evaluate_model(
                 loss.backward()
                 optimizer.step()
 
-                running_loss_train += loss.detach()
+                running_loss_train += loss.detach() * inputs.size(0)
 
-                _, chosen_classes = torch.topk(outputs, 2, 1)
                 if epoch % save_every_nth_all == 0:
-                    running_corrects_train += calculate_accuracy(chosen_classes, labels)
+                    running_corrects_train += calculate_accuracy(outputs, labels)
 
                 if i % save_every_nth_batch_loss == 0:
                     log_values('train/batch_loss', loss.item())
@@ -112,9 +118,8 @@ def train_and_evaluate_model(
 
                 running_loss_val += loss.detach()
 
-                _, chosen_classes = torch.topk(outputs, 2, 1)
                 if epoch % save_every_nth_all == 0:
-                    running_corrects_val += calculate_accuracy(chosen_classes, labels)
+                    running_corrects_val += calculate_accuracy(outputs, labels)
 
             epoch_loss_test = running_loss_val / len(val_set)
             log_values('validation/loss', epoch_loss_test)
