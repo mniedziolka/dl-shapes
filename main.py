@@ -43,10 +43,10 @@ def train_classifier(transform_images, transform_all):
     batch_size = 1000
 
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
-                                               shuffle=True, num_workers=2)
+                                               shuffle=True, num_workers=8)
 
     validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=batch_size,
-                                                    shuffle=False, num_workers=2)
+                                                    shuffle=False, num_workers=8)
 
     classes = ('squares', 'circles', 'triangle_up', 'triangle_right',
                'triangle_down', 'triangle_left')

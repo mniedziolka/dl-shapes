@@ -84,13 +84,13 @@ def train_and_evaluate_model(
                 loss.backward()
                 optimizer.step()
 
-                running_loss_train += loss.detach() * inputs.size(0)
+                running_loss_train += loss.detach()
 
                 if epoch % save_every_nth_all == 0:
                     running_corrects_train += calculate_accuracy(outputs, labels)
 
                 if i % save_every_nth_batch_loss == 0:
-                    log_values('train/batch_loss', loss.item())
+                    log_values('train/batch_loss', loss)
 
                 i += 1
 
