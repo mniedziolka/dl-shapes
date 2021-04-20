@@ -80,25 +80,41 @@ def train_counter(transform_images, transform_all):
         transform_images=transform_images
     )
 
-    batch_size = 10
+    batch_size = 100
 
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
-                                               shuffle=True, num_workers=2)
+                                               shuffle=True, num_workers=4)
 
     validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=batch_size,
-                                                    shuffle=False, num_workers=2)
+                                                    shuffle=False, num_workers=4)
 
     model = ShapesCounter().to(device)
 
     def counter_loss(outputs, labels):
-        soft_outputs = F.softmax(outputs.view(outputs.shape[0], 6, 10), dim=2)
+        # print(outputs.shape)
+        # print(labels.shape)
+        # print()
 
-        j = torch.cat([torch.arange(0, 10, device=device).unsqueeze(0)] * 6, 0)
+        soft_outputs = F.softmax(outputs, dim=2)
+
+        j = torch.cat([torch.arange(0, 10, device=device, dtype=torch.float, requires_grad=True).unsqueeze(0)] * 6, 0)
         j = torch.cat([j.unsqueeze(0)] * soft_outputs.shape[0], 0)
+        # print(soft_outputs)
 
         stretched_labels = labels.view(-1, 1).repeat(1, 10).view(soft_outputs.shape[0], 6, 10)
+        # print(j)
+        # print(stretched_labels)
+        # print(soft_outputs)
+        # print(labels)
+        loss = torch.sum(torch.sum(soft_outputs * (j - stretched_labels)**2, dim=1))
+        # print(loss)
+        # exit()
 
-        loss = (soft_outputs * (stretched_labels - j)**2).sum()
+        # print(soft_outputs * (stretched_labels - j)**2)
+        # print(labels)
+        # print(F.softmax(outputs.view(outputs.shape[0], 6, 10), dim=2))
+        # print(loss)
+        # exit()
 
         return loss
 
@@ -109,7 +125,7 @@ def train_counter(transform_images, transform_all):
     hist = train_and_evaluate_model(model, criterion, optimizer,
                                     train_loader, train_set,
                                     validation_loader, validation_set,
-                                    device, save_every_nth_all=1000, num_epochs=100)
+                                    device, num_epochs=100)
 
     return hist
 
