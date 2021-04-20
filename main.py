@@ -80,7 +80,7 @@ def train_counter(transform_images, transform_all):
         transform_images=transform_images
     )
 
-    batch_size = 100
+    batch_size = 1000
 
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
                                                shuffle=True, num_workers=2)
@@ -91,19 +91,17 @@ def train_counter(transform_images, transform_all):
     model = ShapesCounter().to(device)
 
     def counter_loss(outputs, labels):
-        loss = torch.zeros(outputs.shape[0], device=device)
-        for batch in range(outputs.shape[0]):
-            output = outputs[batch]
-            label = labels[batch]
+        soft_outputs = F.softmax(outputs.view(outputs.shape[0], 6, 10), dim=2)
 
-            for i in range(6):
-                class_output = F.softmax(output[i*10:(i+1)*10])
-                class_label = label[i]
+        j = torch.cat([torch.arange(0, 10, device=device).unsqueeze(0)] * 6, 0)
+        j = torch.cat([j.unsqueeze(0)] * soft_outputs.shape[0], 0)
 
-                for j in range(10):
-                    loss[batch] += class_output[j] * (j - class_label)**2
+        stretched_labels = labels.view(-1, 1).repeat(1, 10).view(soft_outputs.shape[0], 6, 10)
 
-        return torch.sum(loss)
+        loss = soft_outputs * (stretched_labels - j)**2
+        loss = torch.sum(loss)
+
+        return loss
 
     criterion = counter_loss
     # optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
@@ -112,7 +110,7 @@ def train_counter(transform_images, transform_all):
     hist = train_and_evaluate_model(model, criterion, optimizer,
                                     train_loader, train_set,
                                     validation_loader, validation_set,
-                                    device, num_epochs=100)
+                                    device, save_every_nth_all=1000, num_epochs=100)
 
     return hist
 

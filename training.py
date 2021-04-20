@@ -126,7 +126,7 @@ def train_and_evaluate_model(
                 print(f'[TEST] accuracy: {epoch_acc_test}')
 
             epoch_end = time.time()
-            print("Epoch elapsed time = %s" % (epoch_end - epoch_start))
+            print(f"Epoch elapsed time = {epoch_end - epoch_start}\n")
 
     except KeyboardInterrupt:
         print('Interrupt')
