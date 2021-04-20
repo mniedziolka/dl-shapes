@@ -80,7 +80,7 @@ def train_counter(transform_images, transform_all):
         transform_images=transform_images
     )
 
-    batch_size = 1000
+    batch_size = 10
 
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
                                                shuffle=True, num_workers=2)
@@ -98,8 +98,7 @@ def train_counter(transform_images, transform_all):
 
         stretched_labels = labels.view(-1, 1).repeat(1, 10).view(soft_outputs.shape[0], 6, 10)
 
-        loss = soft_outputs * (stretched_labels - j)**2
-        loss = torch.sum(loss)
+        loss = (soft_outputs * (stretched_labels - j)**2).sum()
 
         return loss
 

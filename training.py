@@ -77,7 +77,7 @@ def train_and_evaluate_model(
                 loss.backward()
                 optimizer.step()
 
-                running_loss_train += loss.detach() * inputs.size(0)
+                running_loss_train += loss.detach()
 
                 _, chosen_classes = torch.topk(outputs, 2, 1)
                 if epoch % save_every_nth_all == 0:
@@ -110,7 +110,7 @@ def train_and_evaluate_model(
                 outputs = model(inputs)
                 loss = criterion(outputs, labels)
 
-                running_loss_val += loss.detach() * inputs.size(0)
+                running_loss_val += loss.detach()
 
                 _, chosen_classes = torch.topk(outputs, 2, 1)
                 if epoch % save_every_nth_all == 0:
