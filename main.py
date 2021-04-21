@@ -18,7 +18,7 @@ from models.shapes_classifier import ShapesClassifier
 from models.shapes_counter import ShapesCounter
 
 from training import train_and_evaluate_model, setup_neptune
-from training import tracked_values
+from training import npt_run
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -181,6 +181,9 @@ def main(args):
     if args.file:
         with open(args.file, 'w') as f:
             json.dump(hist, f)
+
+        if args.neptune:
+            npt_run['hist'].upload_file(args.file)
 
     print('-' * 10)
     print('Finished Training')
