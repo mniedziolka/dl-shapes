@@ -43,32 +43,22 @@ class ShapesClassifier(nn.Module):
             nn.BatchNorm2d(128),
             nn.ReLU()
         )
-        #
-        # self.conv5 = nn.Sequential(
-        #     nn.Conv2d(in_channels=128,
-        #               out_channels=64,
-        #               kernel_size=(3, 3),
-        #               padding=(1, 1)),
-        #     nn.BatchNorm2d(64),
-        #     nn.ReLU()
-        # )
-        #
-        # self.conv6 = nn.Sequential(
-        #     nn.Conv2d(in_channels=64,
-        #               out_channels=32,
-        #               kernel_size=(3, 3),
-        #               padding=(1, 1)),
-        #     nn.BatchNorm2d(32),
-        #     nn.ReLU()
-        # )
 
         self.fc1 = nn.Sequential(
             nn.Linear(128, 100),
+            nn.Dropout(0.2),
             nn.BatchNorm1d(100),
             nn.ReLU()
         )
 
         self.fc2 = nn.Sequential(
+            nn.Linear(100, 50),
+            nn.Dropout(0.1),
+            nn.BatchNorm1d(50),
+            nn.ReLU()
+        )
+
+        self.fc3 = nn.Sequential(
             nn.Linear(100, 6)
         )
 
@@ -87,7 +77,7 @@ class ShapesClassifier(nn.Module):
 
         x = self.fc1(x)
         x = self.fc2(x)
-        # x = self.fc3(x)
+        x = self.fc3(x)
 
         # x = F.relu(F.dropout(self.fc1(x), p=0.6))
         # x = F.relu(F.dropout(self.fc2(x), p=0.2))
