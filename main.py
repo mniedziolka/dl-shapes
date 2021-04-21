@@ -40,7 +40,7 @@ def train_classifier(transform_images, transform_all):
         transform_images=transform_images
     )
 
-    batch_size = 1000
+    batch_size = 10
 
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
                                                shuffle=True, num_workers=8)
@@ -80,13 +80,13 @@ def train_counter(transform_images, transform_all):
         transform_images=transform_images
     )
 
-    batch_size = 100
+    batch_size = 1000
 
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
-                                               shuffle=True, num_workers=4)
+                                               shuffle=True, num_workers=8)
 
     validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=batch_size,
-                                                    shuffle=False, num_workers=4)
+                                                    shuffle=False, num_workers=8)
 
     model = ShapesCounter().to(device)
 
@@ -106,7 +106,18 @@ def train_counter(transform_images, transform_all):
         # print(stretched_labels)
         # print(soft_outputs)
         # print(labels)
-        loss = torch.sum(torch.sum(soft_outputs * (j - stretched_labels)**2, dim=1))
+
+        _, chosen_classes = torch.max(soft_outputs, 2)
+        non_zero = torch.sum(chosen_classes > 0, dim=1)
+        reg = torch.sum(non_zero - torch.ones_like(non_zero) * 2) ** 2
+
+        loss = torch.sum(
+            torch.sum(soft_outputs * (j - stretched_labels)**2, dim=1)
+        )
+
+        # print(loss)
+        # print(reg)
+        # print()
         # print(loss)
         # exit()
 
@@ -116,11 +127,11 @@ def train_counter(transform_images, transform_all):
         # print(loss)
         # exit()
 
-        return loss
+        return loss # + reg
 
     criterion = counter_loss
-    # optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-    optimizer = optim.Adam(model.parameters())
+    # optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=2)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     hist = train_and_evaluate_model(model, criterion, optimizer,
                                     train_loader, train_set,

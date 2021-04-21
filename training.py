@@ -25,7 +25,7 @@ def setup_neptune():
 
     NEPTUNE = True
     npt_run = neptune.init(project='uw-niedziol/dl-shapes',
-                           source_files=['*.py'])
+                           source_files=['*.py', 'models/*.py', 'datasets/*.py'])
 
 
 def log_values(key, value):
@@ -64,9 +64,13 @@ def calculate_counter(outputs, labels):
     #
     # print()
 
-    # print("PREDICTION -> ", chosen_classes, "\t TARGEt ->", labels)
+    # print("PREDICTION -> ", chosen_classes[0], "\t TARGEt ->", labels[0])
     accuracy = torch.sum(torch.all(chosen_classes == labels, dim=1))
     # exit()
+
+    # print(accuracy)
+    # print()
+
     return accuracy
 
 
@@ -115,15 +119,13 @@ def train_and_evaluate_model(
 
                 optimizer.zero_grad()
                 loss.backward()
-                # for p in model.parameters():
-                #     print(p.grad.norm())
-                # print()
+
                 optimizer.step()
 
                 running_loss_train += loss.detach()
 
                 if epoch % save_every_nth_all == 0:
-                    running_corrects_train += calculate_accuracy(model, outputs, labels)
+                    running_corrects_train += calculate_accuracy(model, outputs, labels).detach()
 
                 if i % save_every_nth_batch_loss == 0:
                     log_values('train/batch_loss', loss)
