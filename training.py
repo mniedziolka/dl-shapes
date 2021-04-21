@@ -33,7 +33,7 @@ def log_values(key, value):
     if NEPTUNE:
         npt_run[key].log(value)
 
-    hist_run[key].append(value)
+    hist_run[key].append(value.detach().item())
 
 
 def calculate_classification(outputs, labels):

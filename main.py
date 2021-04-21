@@ -1,18 +1,15 @@
 import argparse
+import json
+import neptune
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
 import torchvision
 import torchvision.transforms as transforms
-
-import neptune
-from torch.autograd import Variable
 
 from datasets.shapes_dataset import ShapesClassificationDataset, ShapesCounterDataset
 from datasets.transformers import RandomVerticalFlip, RandomHorizontalFlip, RandomRightRotation
@@ -21,6 +18,7 @@ from models.shapes_classifier import ShapesClassifier
 from models.shapes_counter import ShapesCounter
 
 from training import train_and_evaluate_model, setup_neptune
+from training import tracked_values
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -61,7 +59,7 @@ def train_classifier(transform_images, transform_all):
     hist = train_and_evaluate_model(model, criterion, optimizer,
                                     train_loader, train_set,
                                     validation_loader, validation_set,
-                                    device, num_epochs=100)
+                                    device, num_epochs=3)
 
     return hist
 
@@ -169,6 +167,8 @@ def main(args):
         RandomRightRotation(0.5),
     ])
 
+    hist = None
+
     if args.model == 'classifier':
         hist = train_classifier(transform_images, transform_all)
 
@@ -177,6 +177,10 @@ def main(args):
 
     else:
         raise ValueError('Unknown model')
+
+    if args.file:
+        with open(args.file, 'w') as f:
+            json.dump(hist, f)
 
     print('-' * 10)
     print('Finished Training')
@@ -191,6 +195,8 @@ if __name__ == '__main__':
                         help='which model should be trained')
     parser.add_argument('-e', '--entropy', action='store_true',
                         help='development or training environment')
+    parser.add_argument('-f', '--file', action='store', type=str,
+                        help='file for storing output for plotting')
 
     args = parser.parse_args()
     main(args)
