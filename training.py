@@ -20,12 +20,13 @@ npt_run = None
 hist_run = {key: [] for key in tracked_values}
 
 
-def setup_neptune():
+def setup_neptune(model):
     global NEPTUNE, npt_run
 
     NEPTUNE = True
     npt_run = neptune.init(project='uw-niedziol/dl-shapes',
-                           source_files=['*.py', 'models/*.py', 'datasets/*.py'])
+                           source_files=['*.py', 'models/*.py', 'datasets/*.py'],
+                           tags=[model])
 
 
 def log_values(key, value):

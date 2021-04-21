@@ -24,6 +24,9 @@ from training import train_and_evaluate_model, setup_neptune
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
+BATCH_SIZE = 100
+WORKERS = 2
+
 
 def train_classifier(transform_images, transform_all):
     train_set = ShapesClassificationDataset(
@@ -40,13 +43,11 @@ def train_classifier(transform_images, transform_all):
         transform_images=transform_images
     )
 
-    batch_size = 10
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=BATCH_SIZE,
+                                               shuffle=True, num_workers=WORKERS)
 
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
-                                               shuffle=True, num_workers=8)
-
-    validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=batch_size,
-                                                    shuffle=False, num_workers=8)
+    validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=BATCH_SIZE,
+                                                    shuffle=False, num_workers=WORKERS)
 
     classes = ('squares', 'circles', 'triangle_up', 'triangle_right',
                'triangle_down', 'triangle_left')
@@ -82,11 +83,11 @@ def train_counter(transform_images, transform_all):
 
     batch_size = 1000
 
-    train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size,
-                                               shuffle=True, num_workers=8)
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=BATCH_SIZE,
+                                               shuffle=True, num_workers=WORKERS)
 
-    validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=batch_size,
-                                                    shuffle=False, num_workers=8)
+    validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=BATCH_SIZE,
+                                                    shuffle=False, num_workers=WORKERS)
 
     model = ShapesCounter().to(device)
 
@@ -142,8 +143,18 @@ def train_counter(transform_images, transform_all):
 
 
 def main(args):
+    global BATCH_SIZE, WORKERS
+
     if args.neptune:
-        setup_neptune()
+        setup_neptune(args.model)
+
+    if args.entropy:
+        BATCH_SIZE = 1000
+        WORKERS = 8
+
+    print('-' * 10)
+    print(f'Settings: batch = {BATCH_SIZE}, workers = {WORKERS}')
+    print('-' * 10)
 
     transform_images = transforms.Compose([
         transforms.Grayscale(num_output_channels=1),
@@ -167,7 +178,9 @@ def main(args):
     else:
         raise ValueError('Unknown model')
 
+    print('-' * 10)
     print('Finished Training')
+    print('-' * 10)
 
 
 if __name__ == '__main__':
@@ -176,6 +189,8 @@ if __name__ == '__main__':
                         help='use neptune.ai for logging')
     parser.add_argument('-m', '--model', action='store', type=str, required=True,
                         help='which model should be trained')
+    parser.add_argument('-e', '--entropy', action='store_true',
+                        help='development or training environment')
 
     args = parser.parse_args()
     main(args)
