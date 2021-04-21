@@ -18,8 +18,7 @@ class ShapesClassifier(nn.Module):
         self.conv2 = nn.Sequential(
             nn.Conv2d(in_channels=16,
                       out_channels=32,
-                      kernel_size=(5, 5),
-                      stride=(2, 2),
+                      kernel_size=(3, 3),
                       padding=(1, 1)),
             nn.BatchNorm2d(32),
             nn.ReLU()
@@ -28,7 +27,8 @@ class ShapesClassifier(nn.Module):
         self.conv3 = nn.Sequential(
             nn.Conv2d(in_channels=32,
                       out_channels=64,
-                      kernel_size=(7, 7),
+                      kernel_size=(5, 5),
+                      stride=(2, 2),
                       padding=(1, 1)),
             nn.BatchNorm2d(64),
             nn.ReLU()
@@ -37,38 +37,39 @@ class ShapesClassifier(nn.Module):
         self.conv4 = nn.Sequential(
             nn.Conv2d(in_channels=64,
                       out_channels=128,
-                      kernel_size=(3, 3),
+                      kernel_size=(7, 7),
+                      stride=(5, 5),
                       padding=(1, 1)),
             nn.BatchNorm2d(128),
             nn.ReLU()
         )
-
-        self.conv5 = nn.Sequential(
-            nn.Conv2d(in_channels=128,
-                      out_channels=64,
-                      kernel_size=(3, 3),
-                      padding=(1, 1)),
-            nn.BatchNorm2d(64),
-            nn.ReLU()
-        )
-
-        self.conv6 = nn.Sequential(
-            nn.Conv2d(in_channels=64,
-                      out_channels=32,
-                      kernel_size=(3, 3),
-                      padding=(1, 1)),
-            nn.BatchNorm2d(32),
-            nn.ReLU()
-        )
+        #
+        # self.conv5 = nn.Sequential(
+        #     nn.Conv2d(in_channels=128,
+        #               out_channels=64,
+        #               kernel_size=(3, 3),
+        #               padding=(1, 1)),
+        #     nn.BatchNorm2d(64),
+        #     nn.ReLU()
+        # )
+        #
+        # self.conv6 = nn.Sequential(
+        #     nn.Conv2d(in_channels=64,
+        #               out_channels=32,
+        #               kernel_size=(3, 3),
+        #               padding=(1, 1)),
+        #     nn.BatchNorm2d(32),
+        #     nn.ReLU()
+        # )
 
         self.fc1 = nn.Sequential(
-            nn.Linear(128, 80),
-            nn.BatchNorm1d(80),
+            nn.Linear(128, 100),
+            nn.BatchNorm1d(100),
             nn.ReLU()
         )
 
         self.fc2 = nn.Sequential(
-            nn.Linear(80, 6)
+            nn.Linear(100, 6)
         )
 
     def forward(self, x):
@@ -77,8 +78,8 @@ class ShapesClassifier(nn.Module):
         x = self.conv2(x)
         x = self.conv3(x)
         x = self.conv4(x)
-        x = self.conv5(x)
-        x = self.conv6(x)
+        # x = self.conv5(x)
+        # x = self.conv6(x)
 
         # print(x.shape)
         x = x.view(x.shape[0], -1)
