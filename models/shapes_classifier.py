@@ -59,7 +59,7 @@ class ShapesClassifier(nn.Module):
         )
 
         self.fc3 = nn.Sequential(
-            nn.Linear(100, 6)
+            nn.Linear(50, 6)
         )
 
     def forward(self, x):
