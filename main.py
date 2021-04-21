@@ -17,12 +17,11 @@ from datasets.transformers import RandomVerticalFlip, RandomHorizontalFlip, Rand
 from models.shapes_classifier import ShapesClassifier
 from models.shapes_counter import ShapesCounter
 
-from training import train_and_evaluate_model, setup_neptune
-from training import npt_run
+from training import train_and_evaluate_model, setup_neptune, upload_file
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-BATCH_SIZE = 100
+BATCH_SIZE = 500
 WORKERS = 2
 
 
@@ -30,7 +29,7 @@ def train_classifier(transform_images, transform_all):
     train_set = ShapesClassificationDataset(
         "data/train.csv",
         "data/images",
-        transform_all=None,
+        transform_all=transform_all,
         transform_images=transform_images
     )
 
@@ -59,7 +58,7 @@ def train_classifier(transform_images, transform_all):
     hist = train_and_evaluate_model(model, criterion, optimizer,
                                     train_loader, train_set,
                                     validation_loader, validation_set,
-                                    device, num_epochs=3)
+                                    device, num_epochs=50)
 
     return hist
 
@@ -78,8 +77,6 @@ def train_counter(transform_images, transform_all):
         transform_all=None,
         transform_images=transform_images
     )
-
-    batch_size = 1000
 
     train_loader = torch.utils.data.DataLoader(train_set, batch_size=BATCH_SIZE,
                                                shuffle=True, num_workers=WORKERS)
@@ -183,7 +180,7 @@ def main(args):
             json.dump(hist, f)
 
         if args.neptune:
-            npt_run['hist'].upload_file(args.file)
+            upload_file(args.file)
 
     print('-' * 10)
     print('Finished Training')

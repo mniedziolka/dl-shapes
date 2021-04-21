@@ -29,6 +29,12 @@ def setup_neptune(model):
                            tags=[model])
 
 
+def upload_file(file):
+    global npt_run
+
+    npt_run['hist'].upload(file)
+
+
 def log_values(key, value):
     if NEPTUNE:
         npt_run[key].log(value)
