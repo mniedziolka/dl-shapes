@@ -28,7 +28,7 @@ class ShapesClassifier(nn.Module):
         self.conv3 = nn.Sequential(
             nn.Conv2d(in_channels=32,
                       out_channels=64,
-                      kernel_size=(3, 3),
+                      kernel_size=(7, 7),
                       padding=(1, 1)),
             nn.BatchNorm2d(64),
             nn.ReLU()
@@ -62,7 +62,7 @@ class ShapesClassifier(nn.Module):
         )
 
         self.fc1 = nn.Sequential(
-            nn.Linear(288, 80),
+            nn.Linear(128, 80),
             nn.BatchNorm1d(80),
             nn.ReLU()
         )
