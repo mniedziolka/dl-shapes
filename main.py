@@ -69,7 +69,7 @@ def train_counter(transform_images, transform_all):
     train_set = ShapesCounterDataset(
         "data/train.csv",
         "data/images",
-        transform_all=None,
+        transform_all=transform_all,
         transform_images=transform_images
     )
 
