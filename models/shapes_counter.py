@@ -7,15 +7,24 @@ class ShapesCounter(nn.Module):
         super(ShapesCounter, self).__init__()
         self.conv1 = nn.Sequential(
             nn.Conv2d(in_channels=1,
-                      out_channels=16,
+                      out_channels=4,
                       kernel_size=(3, 3),
                       padding=(1, 1)),
-            nn.BatchNorm2d(16),
-            nn.MaxPool2d((2, 2)),
+            nn.BatchNorm2d(4),
             nn.ReLU()
         )
 
         self.conv2 = nn.Sequential(
+            nn.Conv2d(in_channels=4,
+                      out_channels=16,
+                      kernel_size=(3, 3),
+                      padding=(1, 1)),
+            nn.MaxPool2d(2, 2),
+            nn.BatchNorm2d(16),
+            nn.ReLU()
+        )
+
+        self.conv3 = nn.Sequential(
             nn.Conv2d(in_channels=16,
                       out_channels=32,
                       kernel_size=(3, 3),
@@ -24,7 +33,7 @@ class ShapesCounter(nn.Module):
             nn.ReLU()
         )
 
-        self.conv3 = nn.Sequential(
+        self.conv4 = nn.Sequential(
             nn.Conv2d(in_channels=32,
                       out_channels=64,
                       kernel_size=(5, 5),
@@ -34,39 +43,29 @@ class ShapesCounter(nn.Module):
             nn.ReLU()
         )
 
-        self.conv4 = nn.Sequential(
+        self.conv5 = nn.Sequential(
             nn.Conv2d(in_channels=64,
                       out_channels=128,
                       kernel_size=(7, 7),
-                      stride=(3, 3),
                       padding=(1, 1)),
             nn.BatchNorm2d(128),
             nn.ReLU()
         )
 
-        self.conv5 = nn.Sequential(
-            nn.Conv2d(in_channels=128,
-                      out_channels=256,
-                      kernel_size=(3, 3),
-                      padding=(1, 1)),
-            nn.BatchNorm2d(256),
-            nn.ReLU()
-        )
-
         self.fc1 = nn.Sequential(
-            nn.Linear(256, 200),
-            nn.BatchNorm1d(200),
+            nn.Linear(512, 300),
+            nn.BatchNorm1d(300),
             nn.ReLU()
         )
 
         self.fc2 = nn.Sequential(
-            nn.Linear(200, 100),
-            nn.BatchNorm1d(100),
+            nn.Linear(300, 150),
+            nn.BatchNorm1d(150),
             nn.ReLU()
         )
 
         self.fc3 = nn.Sequential(
-            nn.Linear(100, 60)
+            nn.Linear(150, 60)
         )
 
     def forward(self, x):
