@@ -36,8 +36,7 @@ class ShapesCounter(nn.Module):
         self.conv4 = nn.Sequential(
             nn.Conv2d(in_channels=32,
                       out_channels=64,
-                      kernel_size=(5, 5),
-                      stride=(2, 2),
+                      kernel_size=(3, 3),
                       padding=(1, 1)),
             nn.BatchNorm2d(64),
             nn.ReLU()
@@ -46,26 +45,36 @@ class ShapesCounter(nn.Module):
         self.conv5 = nn.Sequential(
             nn.Conv2d(in_channels=64,
                       out_channels=128,
-                      kernel_size=(7, 7),
+                      kernel_size=(5, 5),
+                      stride=(2, 2),
                       padding=(1, 1)),
             nn.BatchNorm2d(128),
             nn.ReLU()
         )
 
+        self.conv6 = nn.Sequential(
+            nn.Conv2d(in_channels=128,
+                      out_channels=256,
+                      kernel_size=(7, 7),
+                      padding=(1, 1)),
+            nn.BatchNorm2d(256),
+            nn.ReLU()
+        )
+
         self.fc1 = nn.Sequential(
-            nn.Linear(512, 300),
-            nn.BatchNorm1d(300),
+            nn.Linear(1024, 500),
+            nn.BatchNorm1d(500),
             nn.ReLU()
         )
 
         self.fc2 = nn.Sequential(
-            nn.Linear(300, 150),
-            nn.BatchNorm1d(150),
+            nn.Linear(500, 200),
+            nn.BatchNorm1d(200),
             nn.ReLU()
         )
 
         self.fc3 = nn.Sequential(
-            nn.Linear(150, 60)
+            nn.Linear(200, 60)
         )
 
     def forward(self, x):
@@ -75,7 +84,7 @@ class ShapesCounter(nn.Module):
         x = self.conv3(x)
         x = self.conv4(x)
         x = self.conv5(x)
-        # x = self.conv6(x)
+        x = self.conv6(x)
 
         # print(x.shape)
         x = x.view(x.shape[0], -1)
