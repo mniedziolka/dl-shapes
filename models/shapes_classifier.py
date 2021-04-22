@@ -46,14 +46,12 @@ class ShapesClassifier(nn.Module):
 
         self.fc1 = nn.Sequential(
             nn.Linear(128, 100),
-            nn.Dropout(0.2),
             nn.BatchNorm1d(100),
             nn.ReLU()
         )
 
         self.fc2 = nn.Sequential(
             nn.Linear(100, 50),
-            nn.Dropout(0.1),
             nn.BatchNorm1d(50),
             nn.ReLU()
         )

@@ -53,12 +53,14 @@ def train_classifier(transform_images, transform_all):
 
     criterion = nn.BCEWithLogitsLoss(reduction='sum')
     # optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-    optimizer = optim.Adam(model.parameters())
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     hist = train_and_evaluate_model(model, criterion, optimizer,
                                     train_loader, train_set,
                                     validation_loader, validation_set,
-                                    device, num_epochs=50)
+                                    device, num_epochs=100)
+
+    torch.save(model, 'classifier.pt')
 
     return hist
 
