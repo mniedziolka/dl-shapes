@@ -97,7 +97,7 @@ class ShapesCounter(nn.Module):
         x = self.conv5(x)
         x = self.conv6(x)
         x = self.conv7(x)
-        x = self.conv8(x)
+        # x = self.conv8(x)
 
         # print(x.shape)
         x = x.view(x.shape[0], -1)
