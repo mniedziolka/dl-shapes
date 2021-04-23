@@ -103,8 +103,8 @@ def train_counter(transform_images, transform_all):
         return loss
 
     criterion = counter_loss
-    # optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=2)
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    # optimizer = optim.Adam(model.parameters(), lr=0.0)
 
     hist = train_and_evaluate_model(model, criterion, optimizer,
                                     train_loader, train_set,

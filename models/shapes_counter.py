@@ -48,7 +48,6 @@ class ShapesCounter(nn.Module):
                       kernel_size=(6, 6),
                       stride=(2, 2),
                       padding=(1, 1)),
-            nn.Dropout2d(p=0.2),
             nn.BatchNorm2d(128),
             nn.ReLU()
         )
@@ -58,7 +57,6 @@ class ShapesCounter(nn.Module):
                       out_channels=256,
                       kernel_size=(7, 7),
                       padding=(1, 1)),
-            nn.Dropout2d(p=0.2),
             nn.BatchNorm2d(256),
             nn.ReLU()
         )
@@ -67,7 +65,6 @@ class ShapesCounter(nn.Module):
             nn.Conv2d(in_channels=256,
                       out_channels=512,
                       kernel_size=(8, 8)),
-            nn.Dropout2d(p=0.2),
             nn.BatchNorm2d(512),
             nn.ReLU()
         )
