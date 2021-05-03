@@ -122,7 +122,7 @@ def main(args):
 
     if args.entropy:
         BATCH_SIZE = 1000
-        WORKERS = 8
+        WORKERS = 4
 
     print('-' * 10)
     print(f'Settings: batch = {BATCH_SIZE}, workers = {WORKERS}')
