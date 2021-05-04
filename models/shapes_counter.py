@@ -152,6 +152,7 @@ class ShapesCounter135(nn.Module):
             nn.Conv2d(in_channels=64,
                       out_channels=128,
                       kernel_size=(6, 6),
+                      stride=(2, 2),
                       padding=(1, 1)),
             nn.BatchNorm2d(128),
             nn.ReLU()
@@ -170,7 +171,7 @@ class ShapesCounter135(nn.Module):
             nn.Conv2d(in_channels=256,
                       out_channels=512,
                       kernel_size=(8, 8)),
-            nn.BatchNorm2d(256),
+            nn.BatchNorm2d(512),
             nn.ReLU()
         )
 
