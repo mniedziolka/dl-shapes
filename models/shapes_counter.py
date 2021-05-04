@@ -175,16 +175,16 @@ class ShapesCounter135(nn.Module):
         )
 
         self.fc1 = nn.Sequential(
-            nn.Linear(512, 135),
-            # nn.BatchNorm1d(135),
-            # nn.ReLU()
+            nn.Linear(512, 300),
+            nn.BatchNorm1d(300),
+            nn.ReLU()
         )
 
-        # self.fc2 = nn.Sequential(
-        #     nn.Linear(256, 256),
-        #     nn.BatchNorm1d(256),
-        #     nn.ReLU()
-        # )
+        self.fc2 = nn.Sequential(
+            nn.Linear(300, 135),
+            # nn.BatchNorm1d(256),
+            # nn.ReLU()
+        )
         #
         # self.fc3 = nn.Sequential(
         #     nn.Linear(256, 60),
@@ -204,5 +204,6 @@ class ShapesCounter135(nn.Module):
         x = x.view(x.shape[0], -1)
         # print(x.shape)
         x = self.fc1(x)
+        x = self.fc2(x)
 
         return x
