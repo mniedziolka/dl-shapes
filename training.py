@@ -1,8 +1,5 @@
 import neptune.new as neptune
-import numpy as np
 import time
-import torch
-import torch.nn.functional as F
 
 from metrics import calculate_counter, calculate_classification, calculate_counter135
 from models.shapes_classifier import ShapesClassifier

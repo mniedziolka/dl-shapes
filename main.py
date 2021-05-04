@@ -1,13 +1,8 @@
 import argparse
 import json
-import neptune
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torchvision
 import torchvision.transforms as transforms
 
 from datasets.shapes_dataset import ShapesClassificationDataset, ShapesCounterDataset, ShapesCounterDataset135
@@ -117,7 +112,6 @@ def train_counter135(transform_images, transform_all):
 
     model = ShapesCounter135().to(device)
 
-    # criterion = counter135_loss
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.01)
 

@@ -62,27 +62,15 @@ class ShapesClassifier(nn.Module):
         )
 
     def forward(self, x):
-        # print(x.shape)
         x = self.conv1(x)
         x = self.conv2(x)
         x = self.conv3(x)
         x = self.conv4(x)
-        # x = self.conv5(x)
-        # x = self.conv6(x)
 
-        # print(x.shape)
         x = x.view(x.shape[0], -1)
-        # print(x.shape)
 
         x = self.fc1(x)
         x = self.fc2(x)
         x = self.fc3(x)
-
-        # x = F.relu(F.dropout(self.fc1(x), p=0.6))
-        # x = F.relu(F.dropout(self.fc2(x), p=0.2))
-
-        # x = F.relu(self.fc1(x))
-        # x = F.relu(self.fc2(x))
-        # x = self.fc3(x)
 
         return x

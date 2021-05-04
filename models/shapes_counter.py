@@ -1,5 +1,4 @@
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 class ShapesCounter(nn.Module):
@@ -94,9 +93,7 @@ class ShapesCounter(nn.Module):
         x = self.conv6(x)
         x = self.conv7(x)
 
-        # print(x.shape)
         x = x.view(x.shape[0], -1)
-        # print(x.shape)
 
         x = self.fc1(x)
         x = self.fc2(x)
@@ -183,13 +180,7 @@ class ShapesCounter135(nn.Module):
         self.fc2 = nn.Sequential(
             nn.Linear(300, 135),
             nn.BatchNorm1d(135),
-            # nn.ReLU()
         )
-        #
-        # self.fc3 = nn.Sequential(
-        #     nn.Linear(256, 60),
-        #     nn.BatchNorm1d(60),
-        # )
 
     def forward(self, x):
         x = self.conv1(x)
@@ -200,9 +191,7 @@ class ShapesCounter135(nn.Module):
         x = self.conv6(x)
         x = self.conv7(x)
 
-        # print(x.shape)
         x = x.view(x.shape[0], -1)
-        # print(x.shape)
         x = self.fc1(x)
         x = self.fc2(x)
 
