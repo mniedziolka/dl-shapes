@@ -89,7 +89,7 @@ def train_counter(transform_images, transform_all):
     hist = train_and_evaluate_model(model, criterion, optimizer,
                                     train_loader, train_set,
                                     validation_loader, validation_set,
-                                    device, num_epochs=300)
+                                    device, num_epochs=200)
 
     return hist
 
