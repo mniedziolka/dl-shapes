@@ -76,7 +76,7 @@ class ShapesCounter(nn.Module):
 
         self.fc2 = nn.Sequential(
             nn.Linear(256, 256),
-            nn.BatchNorm1d(60),
+            nn.BatchNorm1d(256),
             nn.ReLU()
         )
 
