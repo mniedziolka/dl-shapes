@@ -126,7 +126,6 @@ class ShapesCounter135(nn.Module):
                       kernel_size=(3, 3),
                       padding=(1, 1)),
             nn.BatchNorm2d(16),
-            nn.MaxPool2d((2, 2)),
             nn.ReLU()
         )
 
