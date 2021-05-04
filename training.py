@@ -4,9 +4,9 @@ import time
 import torch
 import torch.nn.functional as F
 
-from metrics import calculate_counter, calculate_classification
+from metrics import calculate_counter, calculate_classification, calculate_counter135
 from models.shapes_classifier import ShapesClassifier
-from models.shapes_counter import ShapesCounter
+from models.shapes_counter import ShapesCounter, ShapesCounter135
 
 tracked_values = ['train/loss',
                   'train/acc',
@@ -46,6 +46,8 @@ def calculate_accuracy(model, outputs, labels):
         return calculate_classification(outputs, labels)
     elif isinstance(model, ShapesCounter):
         return calculate_counter(outputs, labels)
+    elif isinstance(model, ShapesCounter135):
+        return calculate_counter135(outputs, labels)
     else:
         raise ValueError('Unknown model')
 

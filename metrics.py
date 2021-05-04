@@ -1,4 +1,5 @@
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -17,6 +18,12 @@ def counter_loss(outputs, labels):
     )
 
     return loss
+
+
+def counter135_loss(outputs, labels):
+    labels_max = torch.argmax(labels, dim=1)
+
+    return nn.CrossEntropyLoss()(outputs, labels_max)
 
 
 def calculate_classification(outputs, labels):
@@ -42,3 +49,9 @@ def calculate_counter(outputs, labels):
     accuracy = torch.sum(torch.all(chosen_classes == labels, dim=1))
 
     return accuracy
+
+
+def calculate_counter135(outputs, labels):
+    _, preds = torch.max(outputs, 1)
+
+    return torch.sum(preds == labels)

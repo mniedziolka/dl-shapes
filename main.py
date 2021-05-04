@@ -10,17 +10,17 @@ import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
 
-from datasets.shapes_dataset import ShapesClassificationDataset, ShapesCounterDataset
+from datasets.shapes_dataset import ShapesClassificationDataset, ShapesCounterDataset, ShapesCounterDataset135
 from datasets.transformers import RandomVerticalFlip, RandomHorizontalFlip, RandomRightRotation
 
-from metrics import counter_loss
+from metrics import counter_loss, counter135_loss
 from models.shapes_classifier import ShapesClassifier
-from models.shapes_counter import ShapesCounter
+from models.shapes_counter import ShapesCounter, ShapesCounter135
 from training import train_and_evaluate_model, setup_neptune, upload_file
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-BATCH_SIZE = 500
+BATCH_SIZE = 100
 WORKERS = 2
 
 
@@ -94,6 +94,41 @@ def train_counter(transform_images, transform_all):
     return hist
 
 
+def train_counter135(transform_images, transform_all):
+    train_set = ShapesCounterDataset135(
+        "data/train.csv",
+        "data/images",
+        transform_all=transform_all,
+        transform_images=transform_images
+    )
+
+    validation_set = ShapesCounterDataset135(
+        "data/val.csv",
+        "data/images",
+        transform_all=None,
+        transform_images=transform_images
+    )
+
+    train_loader = torch.utils.data.DataLoader(train_set, batch_size=BATCH_SIZE,
+                                               shuffle=True, num_workers=WORKERS)
+
+    validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=BATCH_SIZE,
+                                                    shuffle=False, num_workers=WORKERS)
+
+    model = ShapesCounter135().to(device)
+
+    # criterion = counter135_loss
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.01)
+
+    hist = train_and_evaluate_model(model, criterion, optimizer,
+                                    train_loader, train_set,
+                                    validation_loader, validation_set,
+                                    device, num_epochs=100)
+
+    return hist
+
+
 def main(args):
     global BATCH_SIZE, WORKERS
 
@@ -124,10 +159,10 @@ def main(args):
 
     if args.model == 'classifier':
         hist = train_classifier(transform_images, transform_all)
-
     elif args.model == 'counter':
         hist = train_counter(transform_images, transform_all)
-
+    elif args.model == 'counter135':
+        hist = train_counter135(transform_images, transform_all)
     else:
         raise ValueError('Unknown model')
 
