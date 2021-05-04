@@ -5,9 +5,9 @@ Using DL to solve shape classification and shapes counting problem.
 
 1. **Shape classification**: network outputs six numbers:
    probabilities of a class being found on the image (in at least one copy).
-2. **Geometic shapes counting**: network outputs $10$ probabilities for each class,
+2. **Geometric shapes counting**: network outputs 10 probabilities for each class,
    representing different numbers of objects of this class on the image.
-   So the network should have $60$ outputs. Outputs $0..9$ should sum up to $100\%$, so outputs $10..19$, and so on.
+   So the network should have 60 outputs. Outputs from 0 to 9 should sum up to 100%, so outputs from 10 to 19, and so on.
    
 ## Files
 
