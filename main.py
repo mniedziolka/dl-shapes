@@ -6,7 +6,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
 import torchvision
 import torchvision.transforms as transforms
@@ -14,9 +13,9 @@ import torchvision.transforms as transforms
 from datasets.shapes_dataset import ShapesClassificationDataset, ShapesCounterDataset
 from datasets.transformers import RandomVerticalFlip, RandomHorizontalFlip, RandomRightRotation
 
+from metrics import counter_loss
 from models.shapes_classifier import ShapesClassifier
 from models.shapes_counter import ShapesCounter
-
 from training import train_and_evaluate_model, setup_neptune, upload_file
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -46,13 +45,9 @@ def train_classifier(transform_images, transform_all):
     validation_loader = torch.utils.data.DataLoader(validation_set, batch_size=BATCH_SIZE,
                                                     shuffle=False, num_workers=WORKERS)
 
-    classes = ('squares', 'circles', 'triangle_up', 'triangle_right',
-               'triangle_down', 'triangle_left')
-
     model = ShapesClassifier().to(device)
 
     criterion = nn.BCEWithLogitsLoss(reduction='sum')
-    # optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     hist = train_and_evaluate_model(model, criterion, optimizer,
@@ -88,22 +83,7 @@ def train_counter(transform_images, transform_all):
 
     model = ShapesCounter().to(device)
 
-    def counter_loss(outputs, labels):
-        soft_outputs = F.softmax(outputs, dim=2)
-
-        j = torch.cat([torch.arange(0, 10, device=device, dtype=torch.float, requires_grad=True).unsqueeze(0)] * 6, 0)
-        j = torch.cat([j.unsqueeze(0)] * soft_outputs.shape[0], 0)
-
-        stretched_labels = labels.view(-1, 1).repeat(1, 10).view(soft_outputs.shape[0], 6, 10)
-
-        loss = torch.sum(
-            torch.sum(soft_outputs * (j - stretched_labels)**2, dim=1)
-        )
-
-        return loss
-
     criterion = counter_loss
-    # optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
     optimizer = optim.Adam(model.parameters(), lr=0.01)
 
     hist = train_and_evaluate_model(model, criterion, optimizer,
@@ -131,7 +111,6 @@ def main(args):
     transform_images = transforms.Compose([
         transforms.Grayscale(num_output_channels=1),
         transforms.ToTensor(),
-        # transforms.Normalize((0.5, 0.5, 0.5, 0.5), (0.5, 0.5, 0.5, 0.5)),
         transforms.Normalize(0.5, 0.5)
     ])
 

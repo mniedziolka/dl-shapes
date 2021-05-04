@@ -1,11 +1,10 @@
-from numba import jit
-
 import neptune.new as neptune
 import numpy as np
 import time
 import torch
 import torch.nn.functional as F
 
+from metrics import calculate_counter, calculate_classification
 from models.shapes_classifier import ShapesClassifier
 from models.shapes_counter import ShapesCounter
 
@@ -40,45 +39,6 @@ def log_values(key, value):
         npt_run[key].log(value)
 
     hist_run[key].append(value.detach().item())
-
-
-def calculate_classification(outputs, labels):
-    _, chosen_classes = torch.topk(outputs, 2, 1, sorted=False)
-
-    chosen_classes, _ = torch.sort(chosen_classes, dim=1)
-
-    accuracy = torch.sum(
-        torch.all(
-            chosen_classes == torch.nonzero(labels, as_tuple=True)[1].view(-1, 2),
-            dim=1
-        )
-    )
-
-    return accuracy
-
-
-def calculate_counter(outputs, labels):
-    # print(outputs)
-    # print(outputs.view(outputs.shape[0], 6, 10))
-    soft_outputs = F.softmax(outputs, dim=2)
-    # print(soft_outputs)
-
-    _, chosen_classes = torch.max(soft_outputs, 2)
-    # print(chosen_classes.shape)
-    # print(labels.shape)
-    # print(chosen_classes)
-    # print(labels)
-    #
-    # print()
-
-    # print("PREDICTION -> ", chosen_classes[0], "\t TARGEt ->", labels[0])
-    accuracy = torch.sum(torch.all(chosen_classes == labels, dim=1))
-    # exit()
-
-    # print(accuracy)
-    # print()
-
-    return accuracy
 
 
 def calculate_accuracy(model, outputs, labels):

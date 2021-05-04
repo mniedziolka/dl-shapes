@@ -19,7 +19,6 @@ class ShapesCounter(nn.Module):
                       out_channels=16,
                       kernel_size=(3, 3),
                       padding=(1, 1)),
-            # nn.MaxPool2d(2, 2),
             nn.BatchNorm2d(16),
             nn.ReLU()
         )
@@ -71,7 +70,7 @@ class ShapesCounter(nn.Module):
 
         self.fc1 = nn.Sequential(
             nn.Linear(512, 60),
-            nn.BatchNorm1d(60),
+            # nn.BatchNorm1d(60),
             # nn.ReLU()
         )
 
