@@ -126,6 +126,7 @@ class ShapesCounter135(nn.Module):
                       kernel_size=(3, 3),
                       padding=(1, 1)),
             nn.BatchNorm2d(16),
+            nn.MaxPool2d((2, 2)),
             nn.ReLU()
         )
 
@@ -151,7 +152,6 @@ class ShapesCounter135(nn.Module):
             nn.Conv2d(in_channels=64,
                       out_channels=128,
                       kernel_size=(6, 6),
-                      stride=(2, 2),
                       padding=(1, 1)),
             nn.BatchNorm2d(128),
             nn.ReLU()
@@ -160,22 +160,13 @@ class ShapesCounter135(nn.Module):
         self.conv6 = nn.Sequential(
             nn.Conv2d(in_channels=128,
                       out_channels=256,
-                      kernel_size=(7, 7),
-                      padding=(1, 1)),
+                      kernel_size=(8, 8)),
             nn.BatchNorm2d(256),
             nn.ReLU()
         )
 
-        self.conv7 = nn.Sequential(
-            nn.Conv2d(in_channels=256,
-                      out_channels=512,
-                      kernel_size=(8, 8)),
-            nn.BatchNorm2d(512),
-            nn.ReLU()
-        )
-
         self.fc1 = nn.Sequential(
-            nn.Linear(512, 300),
+            nn.Linear(256, 300),
             nn.BatchNorm1d(300),
             nn.ReLU()
         )
@@ -198,7 +189,6 @@ class ShapesCounter135(nn.Module):
         x = self.conv4(x)
         x = self.conv5(x)
         x = self.conv6(x)
-        x = self.conv7(x)
 
         # print(x.shape)
         x = x.view(x.shape[0], -1)
