@@ -5,15 +5,9 @@ Using DL to solve shape classification and shapes counting problem.
 
 1. **Shape classification**: network outputs six numbers:
    probabilities of a class being found on the image (in at least one copy).
-   Loss function is the sum of loglosses over all classes:
-    $$J = -\sum_{j=0}^5y_i*log(\hat y_i)+(1-y_i)*log(1-\hat y_i)$$
-   *Notation:* $y_i$ is a ground truth, $\hat y_i$ is predicted probability of class $i$ on the image.
 2. **Geometic shapes counting**: network outputs $10$ probabilities for each class,
    representing different numbers of objects of this class on the image.
    So the network should have $60$ outputs. Outputs $0..9$ should sum up to $100\%$, so outputs $10..19$, and so on.
-   The loss function for the network is the sum of squared counting errors:
-    $$J = \sum_{i=0}^5 \sum_{j=0}^9\hat y_j^i (j - r^i)^2$$
-   *Notation:* $r^i$ is a ground truth, $\hat y_j^i$ is predicted probability of $j$ figures of class $i$ on the image.
    
 ## Files
 
