@@ -23,7 +23,7 @@ You'll need [pipenv](https://pypi.org/project/pipenv/).
 pipenv install --dev
 pipenv shell
 ```
-Now you cen run the main script.
+Now you can run the main script.
 ```bash
 python main.py -m classifier
 ```
